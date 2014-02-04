@@ -1,0 +1,4 @@
+composer.lock
+apikey.txt
+/vendor/*
+/docs/*
