@@ -34,10 +34,12 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         }
     }
     
-    /*
+    /**
      * @group standard
+     * @vcr GetInvoice_Working
      */
-    public function testGetInvoice_Working() {
+    public function testGetInvoice_Working()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceCreateResponse = $this->client->createInvoice(0.0001, 'BTC');
@@ -66,15 +68,17 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($invoiceCreateResponse->expirationTime, $invoiceGetResponse->expirationTime);
     }
     
-        /*
+	/**
      * @group standard
+     * @vcr GetInvoice_IdFailiure
      */
-    public function testGetInvoice_IdFailiure() {
+    public function testGetInvoice_IdFailiure()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceResponse = $this->client->getInvoice('notavalidinvoice');
         
-         $this->assertInstanceOf('BitPay\Client\ErrorResponse', $invoiceResponse);
+        $this->assertInstanceOf('BitPay\Client\ErrorResponse', $invoiceResponse);
         
         $this->assertObjectHasAttribute('error', $invoiceResponse);
         $this->assertObjectHasAttribute('errorType', $invoiceResponse);
@@ -85,11 +89,12 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Invoice not found', $invoiceResponse->errorMessage);
     }
     
-    /*
+    /**
      * @group standard
+     * @vcr CreateInvoice_Working
      */
-    public function testCreateInvoice_Working() {
-        
+    public function testCreateInvoice_Working()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceResponse = $this->client->createInvoice(0.0001, 'BTC');
@@ -110,11 +115,11 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('BTC', $invoiceResponse->currency);
     }
     
-    /*
+    /**
      * @group standard
      */
-    public function testGetInvoiceFromArray_Working() {
-        
+    public function testGetInvoiceFromArray_Working()
+    {  
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceData = [
@@ -148,10 +153,12 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('BTC', $invoiceResponse->currency);
     }
     
-    /*
+    /**
      * @group standard
+     * @vcr CreateInvoice_WorkingPosData
      */
-    public function testCreateInvoice_WorkingPosData() {
+    public function testCreateInvoice_WorkingPosData()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceResponse = $this->client->createInvoice(0.0001, 'BTC', [
@@ -190,10 +197,11 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('BTC', $invoiceResponse->currency);
     }
     
-    /*
+    /**
      * @group standard
      */
-    public function testCreateInvoice_PosDataException() {
+    public function testCreateInvoice_PosDataException()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $this->setExpectedException('BitPay\Client\InvoicePosDataException');
@@ -208,10 +216,11 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         ]);
     }
     
-    /*
+    /**
      * @group standard
      */
-    public function testCreateInvoice_PriceException() {
+    public function testCreateInvoice_PriceException()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $this->setExpectedException('BitPay\Client\InvoicePriceException');
@@ -219,10 +228,11 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->client->createInvoice('wrong type', 'BTC');
     }
     
-    /*
+    /**
      * @group standard
      */
-    public function testCreateInvoice_CurrencyException() {
+    public function testCreateInvoice_CurrencyException()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $this->setExpectedException('BitPay\Client\InvoiceCurrencyException');
@@ -230,10 +240,12 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->client->createInvoice(0.0001, 'Not A Currency');
     }
     
-    /*
+    /**
      * @group standard
+     * @vcr CreateInvoice_AuthFailiure
      */
-    public function testCreateInvoice_authFailiure() {
+    public function testCreateInvoice_AuthFailiure()
+    {
         $this->client = new BitPayClient('');
         
         $invoiceResponse = $this->client->createInvoice(0.0001, 'BTC');
@@ -249,10 +261,12 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('invalid api key', $invoiceResponse->errorMessage);
     }
     
-    /*
+    /**
      * @group standard
+     * @vcr CreateInvoice_PriceFailiure
      */
-    public function testCreateInvoice_PriceFailiure() {
+    public function testCreateInvoice_PriceFailiure()
+    {
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceResponse = $this->client->createInvoice(0, 'GBP');
@@ -268,11 +282,12 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('One or more fields is invalid', $invoiceResponse->errorMessage);
     }
     
-    /*
-     * @group all
+    /**
+     * @group limit
+     * @vcr CreateInvoice_LimitExceeded
      */
-    public function testCreateInvoice_LimitExceeded() {
-        
+    public function testCreateInvoice_LimitExceeded()
+    {  
         $this->client = new BitPayClient(self::$apiKey);
         
         $invoiceResponse = $this->client->createInvoice(100, 'BTC');

@@ -8,16 +8,18 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "guzzle/guzzle": "~3.7"
+        "guzzle/guzzle": "~3.8"
     },
     "autoload": {
         "psr-0": {
-            "BitPay\\Client\\": "src/",
-            "BitPay\\Test\\": "tests/"
+            "BitPay\\Client\\": "src/"
         }
     },
+    "license": "GPL-3.0",
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
-        "phpdocumentor/phpdocumentor": "2.*"
+        "phpdocumentor/phpdocumentor": "2.*",
+        "php-vcr/php-vcr": "dev-master",
+        "php-vcr/phpunit-testlistener-vcr": "dev-master"
     }
 }
