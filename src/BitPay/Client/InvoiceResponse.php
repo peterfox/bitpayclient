@@ -2,21 +2,21 @@
 
 /**
  * The Response returned by the BitPayClient for a successful API call
- * 
+ *
  * @author Peter Fox <peterfox@peterfox.me>
- * @copyright 2014 Peter Fox 
+ * @copyright 2014 Peter Fox
  * @license https://www.gnu.org/licenses/gpl-3.0.html GNU Public License
  * @link https://github.com/peterfox/BitPayClient
- * 
+ *
  * @package BitPay\Client
  */
 
 namespace BitPay\Client;
 
 class InvoiceResponse implements BitPayResponse {
-    
+
     /** @var boolean $error a flag that is always false in the class */
-    public $error = true;
+    public $error = false;
     /** @var String $id the unique ID of the invoice */
     public $id;
     /** @var String $url the url where you can view the invoice to be able to pay for it etc. */

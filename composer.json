@@ -1,5 +1,6 @@
 {
     "name": "peterfox/bitpayclient",
+    "description": "The purpose of this library is to be an object orientated alternative to the official BitPay PHP library. The library is designed to make it easier to integrate BitPay in to more heavy PHP frameworks that use composer as a package manager such as Symfony2 and Laravel.",
     "authors": [
         {
             "name": "Peter Fox",
@@ -17,9 +18,9 @@
     },
     "license": "GPL-3.0",
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
+        "phpunit/phpunit": "~4.0.0",
         "phpdocumentor/phpdocumentor": "2.*",
-        "php-vcr/php-vcr": "dev-master",
-        "php-vcr/phpunit-testlistener-vcr": "dev-master"
+        "php-vcr/php-vcr": ">=1.1.1",
+        "php-vcr/phpunit-testlistener-vcr": "~1.1.0"
     }
 }
