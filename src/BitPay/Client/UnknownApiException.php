@@ -13,6 +13,6 @@
 
 namespace BitPay\Client;
 
-class UnknownApiException extends Exception {
+class UnknownApiException extends \Exception {
     
 }

@@ -13,6 +13,6 @@
 
 namespace BitPay\Client;
 
-class InvoiceCurrencyException extends \Exception {
+class InvoiceCurrencyException extends \InvalidArgumentException {
     
 }

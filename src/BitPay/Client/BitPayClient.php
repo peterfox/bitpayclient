@@ -13,7 +13,7 @@
 
 namespace BitPay\Client;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Guzzle\Common\Collection;
 
 /**
@@ -39,17 +39,26 @@ class BitPayClient
     * @param Array $defaults An array of default values to be used in post requests
     * @param Array $invoiceParameters An array of default values to be used for invoices
     * @param boolean $throwResponseExceptions A switch which will cause the client to throw exception on Error response from api calls
+    * @param \Symfony\Component\EventDispatcher\EventSubscriberInterface[] $plugins An array of plugins that can be used with the Guzzle Client
     */
     public function __construct($apiKey, Array $defaults = [],
-            Array $invoiceParameters = [], $throwResponseExceptions = false)
+            Array $invoiceParameters = [], $throwResponseExceptions = false, Array $plugins = [])
     {
-        $this->client = new Client('https://bitpay.com/api');
+        $this->client = new Client();
         //$this->client->setDefaultOption('header/Content-Type', 'application/json');
         $this->apiKey = $apiKey;
         $this->apiCollection = $this->createDefaultPostParameters($defaults);
         $this->invoiceCollection = $this->createDefaultPostParameters($invoiceParameters);
 
         $this->responseFactory = new BitPayResponseFactory($throwResponseExceptions);
+
+        foreach ($plugins as $plugin) {
+            if ($plugin instanceof \GuzzleHttp\Event\SubscriberInterface) {
+                $this->client->getEmitter()->attach($plugin);
+            } else {
+                throw new \InvalidArgumentException('Invalid plugin class does not implement \GuzzleHttp\Event\SubscriberInterface');
+            }
+        }
     }
 
    /**
@@ -140,6 +149,9 @@ class BitPayClient
         if (isset($extraParams['posData'])) {
             $extraParams['posData'] = $this->transformPosData($extraParams['posData']);
         }
+        if (isset($extraParams['notificationURL'])) {
+            $this->validateNotificationUrl($extraParams['notificationURL']);
+        }
         $params = $this->apiCollection->fromConfig($extraParams, $defaults);
 
         $params->add('price', $price);
@@ -164,14 +176,19 @@ class BitPayClient
 
     private function fireOffPostRequest($action, Collection $params, Array $options = [])
     {
-        $response = $this->client->post($action, ['Content-Type' => 'application/json'], json_encode($params->toArray()), $options)->send();
+        $options = new Collection($options);
+        $options->merge(['headers' => ['Content-Type' => 'application/json'], 'body' => json_encode($params->toArray())]);
+
+        $response = $this->client->post("https://bitpay.com/api/$action", $options->toArray());
 
         return $this->responseFactory->buildFromResponse($response);
     }
 
     private function fireOffGetRequest($action, Array $options = [])
     {
-        $response = $this->client->get($action, [], $options)->send();
+        $options = new Collection($options);
+
+        $response = $this->client->get("https://bitpay.com/api/$action", $options->toArray());
 
         return $this->responseFactory->buildFromResponse($response);
     }
@@ -189,6 +206,14 @@ class BitPayClient
         if (!in_array(strtoupper($currency), $this->validCurrencies())) {
 
             throw new InvoiceCurrencyException;
+        }
+    }
+
+    protected function validateNotificationUrl($url)
+    {
+        if (strcasecmp(parse_url($url, PHP_URL_SCHEME), 'https') !== 0) {
+
+            throw new InvoiceNotificationUrlException;
         }
     }
 

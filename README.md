@@ -10,7 +10,10 @@ The library is written by myself, [Peter Fox].
 Version
 ----
 
+1.2.0 - 14th May 2014 - Throws exceptions for invalid notification url attempting to be used with BitPay as well as now allows for HttpGuzzle v4 plugins to be used with the client
+
 1.1.0 - 16th March 2014 - Allows for throwing exception when an error api response is returned
+
 1.0.0 - 5th Feburary 2014
 
 Installation
@@ -21,7 +24,7 @@ Add to your projects composer.json
 ```json
 {
     "require": {
-        "peterfox/bitpayclient":"1.0.*"
+        "peterfox/bitpayclient":"1.*"
     }
 }
 ```

@@ -13,6 +13,6 @@
 
 namespace BitPay\Client;
 
-class InvoicePosDataException extends \Exception {
+class InvoicePosDataException extends \InvalidArgumentException {
     
 }

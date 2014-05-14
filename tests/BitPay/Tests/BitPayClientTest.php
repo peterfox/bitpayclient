@@ -15,6 +15,7 @@ namespace BitPay\Tests;
 
 use BitPay\Client\BitPayClient;
 use BitPay\Client\ErrorResponse;
+use GuzzleHttp\Subscriber\HttpError;
 
 class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
@@ -34,10 +35,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    /**
-     * @group standard
-     * @vcr GetInvoice_Working
-     */
     public function testGetInvoice_Working()
     {
         $this->client = new BitPayClient(self::$apiKey);
@@ -70,7 +67,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
 	/**
      * @group standard
-     * @vcr GetInvoice_IdFailiure
      */
     public function testGetInvoice_IdFailiure()
     {
@@ -91,7 +87,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @group standard
-     * @vcr CreateInvoice_Working
      */
     public function testCreateInvoice_Working()
     {
@@ -155,7 +150,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @group standard
-     * @vcr CreateInvoice_WorkingPosData
      */
     public function testCreateInvoice_WorkingPosData()
     {
@@ -195,6 +189,70 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(0.0001, $invoiceResponse->btcPrice);
         $this->assertEquals('BTC', $invoiceResponse->currency);
+    }
+
+    /**
+     * @group standard
+     */
+    public function testCreateInvoice_WorkingNotificationUrl()
+    {
+        $this->client = new BitPayClient(self::$apiKey);
+
+        $invoiceResponse = $this->client->createInvoice(0.0001, 'BTC', [
+            'notificationURL' => 'https://www.google.co.uk/'
+        ]);
+
+        $this->assertInstanceOf('BitPay\Client\InvoiceResponse', $invoiceResponse);
+
+        $this->assertObjectHasAttribute('id', $invoiceResponse);
+        $this->assertObjectHasAttribute('url', $invoiceResponse);
+        $this->assertObjectHasAttribute('status', $invoiceResponse);
+        $this->assertObjectHasAttribute('btcPrice', $invoiceResponse);
+        $this->assertObjectHasAttribute('price', $invoiceResponse);
+        $this->assertObjectHasAttribute('currency', $invoiceResponse);
+        $this->assertObjectHasAttribute('invoiceTime', $invoiceResponse);
+        $this->assertObjectHasAttribute('expirationTime', $invoiceResponse);
+        $this->assertObjectHasAttribute('currentTime', $invoiceResponse);
+
+        $this->assertEquals(0.0001, $invoiceResponse->btcPrice);
+        $this->assertEquals('BTC', $invoiceResponse->currency);
+    }
+
+    /**
+     * @group standard
+     */
+    public function testCreateInvoice_WithWorkingPlugin()
+    {
+        $this->client = new BitPayClient(self::$apiKey, [], [], false, [
+            new HttpError()
+        ]);
+
+        $invoiceResponse = $this->client->createInvoice(0.0001, 'BTC');
+
+        $this->assertInstanceOf('BitPay\Client\InvoiceResponse', $invoiceResponse);
+
+        $this->assertObjectHasAttribute('id', $invoiceResponse);
+        $this->assertObjectHasAttribute('url', $invoiceResponse);
+        $this->assertObjectHasAttribute('status', $invoiceResponse);
+        $this->assertObjectHasAttribute('btcPrice', $invoiceResponse);
+        $this->assertObjectHasAttribute('price', $invoiceResponse);
+        $this->assertObjectHasAttribute('currency', $invoiceResponse);
+        $this->assertObjectHasAttribute('invoiceTime', $invoiceResponse);
+        $this->assertObjectHasAttribute('expirationTime', $invoiceResponse);
+        $this->assertObjectHasAttribute('currentTime', $invoiceResponse);
+
+        $this->assertEquals(0.0001, $invoiceResponse->btcPrice);
+        $this->assertEquals('BTC', $invoiceResponse->currency);
+    }
+
+    /**
+     * @group standard
+     */
+    public function testCreateClient_PluginInvalidArgumentException()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->client = new BitPayClient(self::$apiKey, [], [], false, [new \stdClass()]);
     }
 
     /**
@@ -242,7 +300,21 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @group standard
-     * @vcr CreateInvoice_AuthFailiure
+     */
+    public function testCreateInvoice_NotificationUrlException()
+    {
+        $this->client = new BitPayClient(self::$apiKey);
+
+        $this->setExpectedException('BitPay\Client\InvoiceNotificationUrlException');
+
+        $this->client->createInvoice(0.0001, 'BTC', [
+            'notificationURL' => 'http://www.google.co.uk/',
+            'fullNotifications' => true
+        ]);
+    }
+
+    /**
+     * @group standard
      */
     public function testCreateInvoice_AuthFailiure()
     {
@@ -263,7 +335,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @group standard
-     * @vcr CreateInvoice_AuthFailiureException
      */
     public function testCreateInvoice_AuthFailiureException()
     {
@@ -276,7 +347,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @group standard
-     * @vcr CreateInvoice_PriceFailiure
      */
     public function testCreateInvoice_PriceFailiure()
     {
@@ -297,7 +367,6 @@ class BitPayClientTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @group limit
-     * @vcr CreateInvoice_LimitExceeded
      */
     public function testCreateInvoice_LimitExceeded()
     {
